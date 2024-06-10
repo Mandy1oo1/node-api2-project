@@ -1,153 +1,129 @@
-# Server Side Routing Module Project
+# Node API 1 Project Starter Code
 
 ## Introduction
 
-Use `Node.js` and `Express` to build an API that performs _CRUD_ operations on `blog posts`.
+- Building a RESTful API.
+- Performing CRUD operations.
+- Writing API endpoints.
 
 ## Instructions
 
 ### Task 1: Project Setup and Submission
 
-Your assignment page on Canvas should contain instructions for submitting this project. If you are still unsure, reach out to School Staff.
+Your instructor should have communicated what submission method to use for this project during the Guided Project and in your cohort's Slack channel. If you are still unsure, reach out to Lambda Staff.
 
 ### Task 2: Minimum Viable Product
 
-- Add the code necessary to `index.js`, `api/server.js` and `api/posts/posts-router.js` to implement the endpoints listed below.
-- Separate the endpoints that begin with `/api/posts` into a separate Express Router inside `api/posts/posts-router.js`.
-- Configure the API to handle to the following routes. Some of these endpoints might require more than one call to the provided database helpers inside `api/posts/posts-model.js`.
+Use Node.js and Express to build an API that performs CRUD operations on users.
 
-| N | Method | Endpoint                | Description                                                                                                                     |
-| - | ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | GET    | /api/posts              | Returns **an array of all the post objects** contained in the database                                                          |
-| 2 | GET    | /api/posts/:id          | Returns **the post object with the specified id**                                                                               |
-| 3 | POST   | /api/posts              | Creates a post using the information sent inside the request body and returns **the newly created post object**                 |
-| 4 | PUT    | /api/posts/:id          | Updates the post with the specified id using data from the request body and **returns the modified document**, not the original |
-| 5 | DELETE | /api/posts/:id          | Removes the post with the specified id and returns the **deleted post object**                                                  |
-| 6 | GET    | /api/posts/:id/comments | Returns an **array of all the comment objects** associated with the post with the specified id                                  |
+- Add a `server` script to the `package.json` that runs the API using `nodemon`.
 
-#### 1 [GET] /api/posts
+### Write endpoints
 
-- If there's an error in retrieving the _posts_ from the database:
-  - respond with HTTP status code `500`.
-  - return the following JSON: `{ message: "The posts information could not be retrieved" }`.
+Add the code necessary in `index.js` and `api/server.js` to create a Web API and implement the following _endpoints_:
 
-#### 2 [GET] /api/posts/:id
+| Method | URL            | Description                                                                                            |
+| ------ | -------------- | ------------------------------------------------------------------------------------------------------ |
+| POST   | /api/users     | Creates a user using the information sent inside the `request body`.                                   |
+| GET    | /api/users     | Returns an array users.                                                                                |
+| GET    | /api/users/:id | Returns the user object with the specified `id`.                                                       |
+| DELETE | /api/users/:id | Removes the user with the specified `id` and returns the deleted user.                                 |
+| PUT    | /api/users/:id | Updates the user with the specified `id` using data from the `request body`. Returns the modified user |
 
-- If the _post_ with the specified `id` is not found:
+#### User Schema
 
-  - return HTTP status code `404` (Not Found).
-  - return the following JSON: `{ message: "The post with the specified ID does not exist" }`.
+Each User _resource_ should conform to the following structure (AKA schema):
 
-- If there's an error in retrieving the _post_ from the database:
-  - respond with HTTP status code `500`.
-  - return the following JSON: `{ message: "The post information could not be retrieved" }`.
+```js
+{
+  id: "a_unique_id", // String, required
+  name: "Jane Doe",  // String, required
+  bio: "Having fun", // String, required
+}
+```
 
-#### 3 [POST] /api/posts
+#### Database Access Functions
 
-- If the request body is missing the `title` or `contents` property:
+You can find them inside `api/users/model.js`. All of these functions return Promises.
+
+- `find` Resolves to the list of users (or empty array).
+- `findById` Takes an `id` and resolves to the user with that id (or null if the id does not exist).
+- `insert` Takes a new user `{ name, bio }` and resolves to the the newly created user `{ id, name, bio }`.
+- `update` Takes an `id` and an existing user `{ name, bio }` and resolves the updated user `{ id, name, bio}` (or null if the id does not exist).
+- `remove` Takes an `id`  and resolves to the deleted user `{ id, name, bio }`.
+
+#### Endpoint Specifications
+
+When the client makes a `POST` request to `/api/users`:
+
+- If the request body is missing the `name` or `bio` property:
 
   - respond with HTTP status code `400` (Bad Request).
-  - return the following JSON: `{ message: "Please provide title and contents for the post" }`.
+  - return the following JSON response: `{ message: "Please provide name and bio for the user" }`.
 
-- If the information about the _post_ is valid:
+- If the information about the _user_ is valid:
 
-  - save the new _post_ the the database.
-  - return HTTP status code `201` (Created).
-  - return the newly created _post_.
+  - save the new _user_ the the database.
+  - respond with HTTP status code `201` (Created).
+  - return the newly created _user document_ including its id.
 
-- If there's an error while saving the _post_:
+- If there's an error while saving the _user_:
   - respond with HTTP status code `500` (Server Error).
-  - return the following JSON: `{ message: "There was an error while saving the post to the database" }`.
+  - return the following JSON object: `{ message: "There was an error while saving the user to the database" }`.
 
-#### 4 [PUT] /api/posts/:id
+When the client makes a `GET` request to `/api/users`:
 
-- If the _post_ with the specified `id` is not found:
+- If there's an error in retrieving the _users_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ message: "The users information could not be retrieved" }`.
 
-  - return HTTP status code `404` (Not Found).
-  - return the following JSON: `{ message: "The post with the specified ID does not exist" }`.
+When the client makes a `GET` request to `/api/users/:id`:
 
-- If the request body is missing the `title` or `contents` property:
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist" }`.
+
+- If there's an error in retrieving the _user_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ message: "The user information could not be retrieved" }`.
+
+When the client makes a `DELETE` request to `/api/users/:id`:
+
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist" }`.
+
+- If there's an error in removing the _user_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ message: "The user could not be removed" }`.
+
+When the client makes a `PUT` request to `/api/users/:id`:
+
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist" }`.
+
+- If the request body is missing the `name` or `bio` property:
 
   - respond with HTTP status code `400` (Bad Request).
-  - return the following JSON: `{ message: "Please provide title and contents for the post" }`.
+  - return the following JSON response: `{ message: "Please provide name and bio for the user" }`.
 
-- If there's an error when updating the _post_:
-
-  - respond with HTTP status code `500`.
-  - return the following JSON: `{ message: "The post information could not be modified" }`.
-
-- If the post is found and the new information is valid:
-
-  - update the post document in the database using the new information sent in the `request body`.
-  - return HTTP status code `200` (OK).
-  - return the newly updated _post_.
-
-#### 5 [DELETE] /api/posts/:id
-
-- If the _post_ with the specified `id` is not found:
-
-  - return HTTP status code `404` (Not Found).
-  - return the following JSON: `{ message: "The post with the specified ID does not exist" }`.
-
-- If there's an error in removing the _post_ from the database:
+- If there's an error when updating the _user_:
 
   - respond with HTTP status code `500`.
-  - return the following JSON: `{ message: "The post could not be removed" }`.
+  - return the following JSON object: `{ message: "The user information could not be modified" }`.
 
-#### 6 [GET] /api/posts/:id/comments
+- If the user is found and the new information is valid:
 
-- If the _post_ with the specified `id` is not found:
-
-  - return HTTP status code `404` (Not Found).
-  - return the following JSON: `{ message: "The post with the specified ID does not exist" }`.
-
-- If there's an error in retrieving the _comments_ from the database:
-
-  - respond with HTTP status code `500`.
-  - return the following JSON: `{ message: "The comments information could not be retrieved" }`.
-
-### Database Persistence Helpers
-
-The `data` folder contains a database populated with test `posts`.
-
-Database access will be done using the `posts-model.js` file included inside the `api/posts` folder:
-
-- `find()`: calling find returns a promise that resolves to an array of all the `posts` contained in the database.
-- `findById()`: this method expects an `id` as it's only argument and returns a promise that resolves to the post corresponding to the `id` provided or `undefined` if no post with that `id` is found.
-- `insert()`: calling insert passing it a `post` object will add it to the database and return a promise that resolves to an object with the `id` of the inserted post. The object looks like this: `{ id: 123 }`.
-- `update()`: accepts two arguments, the first is the `id` of the post to update and the second is an object with the `changes` to apply. It returns a promise that resolves to the count of updated records. If the count is 1 it means the record was updated correctly.
-- `remove()`: the remove method accepts an `id` as its first argument and upon successfully deleting the post from the database it returns a promise that resolves to the number of records deleted.
-- `findPostComments()`: the findPostComments accepts a `postId` as its first argument and returns a promise that resolves to an array of all comments on the post associated with the post id.
-
-### Blog Post Schema
-
-A Blog Post in the database has the following structure:
-
-```js
-{
-  title: "The post title", // String, required
-  contents: "The post contents", // String, required
-  created_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-  updated_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-}
-```
-
-### Comment Schema
-
-A Comment in the database has the following structure:
-
-```js
-{
-  text: "The text of the comment", // String, required
-  post_id: "The id of the associated post", // Integer, required, must match the id of a post entry in the database
-  created_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-  updated_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-}
-```
+  - update the user document in the database using the new information sent in the `request body`.
+  - respond with HTTP status code `200` (OK).
+  - return the newly updated _user document_.
 
 #### Important Notes
 
-- Reset the database by executing `npm run resetdb`.
 - Test your work manually using Postman or HTTPie. Run automatic tests by executing `npm test`.
 - You are welcome to create additional files but **do not move or rename existing files** or folders.
 - Do not alter your `package.json` file except to install additional libraries or add additional scripts. **Do not update existing libs**.
@@ -155,7 +131,17 @@ A Comment in the database has the following structure:
 
 ### Task 3: Stretch Problems
 
-To work on the stretch problems you'll need to enable the `cors` middleware. Follow these steps:
+Be careful not to _break MVP_ while working on these Stretch goals! If in doubt create a new branch.
+
+You'll need to enable the `cors` middleware:
 
 - add the `cors` npm module: `npm i cors`.
 - add `server.use(cors())` after `server.use(express.json())`.
+
+Create a new React application and connect it to your server:
+
+- the React application can be anywhere, but, for this project create it inside the folder for the solution.
+- connect to the `/api/users` endpoint in the API and show the list of users.
+- add a delete button to each displayed user that will remove it from the server.
+- add forms to add and update data.
+- Style the list of users however you see fit.
