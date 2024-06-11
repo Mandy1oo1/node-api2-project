@@ -1,18 +1,19 @@
-const express = require('express')
-const helmet = require('helmet')
-const cors = require('cors')
-const postsRouter = require('./posts/router.js');
+// implement your server here
+// require your posts router and connect it here
+// api/server.js
+const express = require('express');
+const cors = require('cors');
+const postsRouter = require('./posts/posts-router');
 
-const server = express()
+const server = express();
 
-server.use(helmet())
-server.use(express.json())
-server.use(cors())
-server.use('/api/posts', postsRouter)
+server.use(express.json());
+server.use(cors());
+server.use('/api/posts', postsRouter);
 
-// CATCHALL
-server.use('*', (req, res) => {
-  res.status(200).json({message: 'server up and running'})
-})
+server.get('/', (req, res) => {
+  res.send('<h2>Blog Posts API</h2>');
+});
 
-module.exports = server
+module.exports = server;
+
