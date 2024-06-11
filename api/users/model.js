@@ -1,53 +1,47 @@
-const shortid = require('shortid')
-const initializeUsers = () => ([
-  { id: shortid.generate(), name: 'Ed Carter', bio: 'hero' },
-  { id: shortid.generate(), name: 'Mary Edwards', bio: 'super hero' },
-])
+const shortid = require('shortid');
 
-// FAKE IN-MEMORY USERS "TABLE"
-let users = initializeUsers()
+const initializePosts = () => ([
+  { id: shortid.generate(), title: 'First Post', contents: 'This is the first post' },
+  { id: shortid.generate(), title: 'Second Post', contents: 'This is the second post' },
+]);
 
-// DATABASE ACCESS FUNCTIONS
+let posts = initializePosts();
+
 const find = () => {
-  // SELECT * FROM users;
-  return Promise.resolve(users)
-}
+  return Promise.resolve(posts);
+};
 
 const findById = id => {
-  // SELECT * FROM users WHERE id = 1;
-  const user = users.find(d => d.id === id)
-  return Promise.resolve(user)
-}
+  const post = posts.find(post => post.id === id);
+  return Promise.resolve(post);
+};
 
-const insert = ({ name, bio }) => {
-  // INSERT INTO users (name, bio) VALUES ('foo', 'bar');
-  const newUser = { id: shortid.generate(), name, bio }
-  users.push(newUser)
-  return Promise.resolve(newUser)
-}
+const insert = ({ title, contents }) => {
+  const newPost = { id: shortid.generate(), title, contents };
+  posts.push(newPost);
+  return Promise.resolve(newPost);
+};
 
 const update = (id, changes) => {
-  // UPDATE users SET name = 'foo', bio = 'bar WHERE id = 1;
-  const user = users.find(user => user.id === id)
-  if (!user) return Promise.resolve(null)
+  const post = posts.find(post => post.id === id);
+  if (!post) return Promise.resolve(null);
 
-  const updatedUser = { ...changes, id }
-  users = users.map(d => (d.id === id) ? updatedUser : d)
-  return Promise.resolve(updatedUser)
-}
+  const updatedPost = { ...post, ...changes };
+  posts = posts.map(post => (post.id === id ? updatedPost : post));
+  return Promise.resolve(updatedPost);
+};
 
 const remove = id => {
-  // DELETE FROM users WHERE id = 1;
-  const user = users.find(user => user.id === id)
-  if (!user) return Promise.resolve(null)
+  const post = posts.find(post => post.id === id);
+  if (!post) return Promise.resolve(null);
 
-  users = users.filter(d => d.id !== id)
-  return Promise.resolve(user)
-}
+  posts = posts.filter(post => post.id !== id);
+  return Promise.resolve(post);
+};
 
-const resetDB = () => { // ONLY TESTS USE THIS ONE
-  users = initializeUsers()
-}
+const resetDB = () => {
+  posts = initializePosts();
+};
 
 module.exports = {
   find,
@@ -55,5 +49,5 @@ module.exports = {
   insert,
   update,
   remove,
-  resetDB, // ONLY TESTS USE THIS ONE
-}
+  resetDB,
+};
