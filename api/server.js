@@ -1,18 +1,18 @@
-const express = require('express');
-const helmet = require('helmet');
-const userRouter = require('./users/router');
-const postRouter = require('./posts/router');
+const express = require('express')
+const helmet = require('helmet')
+const cors = require('cors')
+const postsRouter = require('./posts/router.js');
 
-const server = express();
+const server = express()
 
-server.use(express.json());
-server.use(helmet());
-server.use('/api/users', userRouter);
-server.use('/api/posts', postRouter);
+server.use(helmet())
+server.use(express.json())
+server.use(cors())
+server.use('/api/posts', postsRouter)
 
-// Adjusted CATCHALL to handle non-existing routes properly
+// CATCHALL
 server.use('*', (req, res) => {
-  res.status(404).json({ message: 'Not Found' });
-});
+  res.status(200).json({message: 'server up and running'})
+})
 
-module.exports = server;
+module.exports = server
